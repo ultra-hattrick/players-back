@@ -24,8 +24,8 @@ type Response struct {
 
 type Player struct {
 	ID                 uint       `json:"ID" gorm:"primaryKey;unique;autoIncrement" xml:"-"`
-	PlayerID           uint       `json:"player_ID" xml:"PlayerID"`
-	TeamID             uint       `json:"team_ID" xml:"-"`
+	PlayerID           uint       `json:"player_ID" gorm:"not null" xml:"PlayerID"`
+	TeamID             uint       `json:"team_ID" gorm:"not null" xml:"-"`
 	FirstName          string     `json:"first_name" xml:"FirstName"`
 	NickName           *string    `json:"nickname" xml:"NickName"`
 	LastName           string     `json:"last_name" xml:"LastName"`
@@ -68,13 +68,20 @@ type Player struct {
 	WingerSkill        *uint8     `json:"watching_skill" xml:"WingerSkill"`
 	DefenderSkill      *uint8     `json:"defender_skill" xml:"DefenderSkill"`
 	SetPiecesSkill     *uint8     `json:"set_pieces_skill" xml:"SetPiecesSkill"`
-	PlayerCategoryId   uint8      `json:"player_category_ID" xml:"PlayerCategoryId"`
-	TrainerData        struct {
-		TrainerType       uint8 `json:"trainer_type" xml:"TrainerType"`
-		TrainerSkillLevel uint8 `json:"trainer_skill_level" xml:"TrainerSkillLevel"`
-	} `json:"trainer_data" gorm:"embedded" xml:"TrainerData"`
+	PlayerCategoryId   *uint8     `json:"player_category_ID" xml:"PlayerCategoryId"`
+	TrainerData        *struct {
+		TrainerType       *uint8 `json:"trainer_type" xml:"TrainerType"`
+		TrainerSkillLevel *uint8 `json:"trainer_skill_level" xml:"TrainerSkillLevel"`
+	} `json:"trainer_data,omitempty" gorm:"embedded" xml:"TrainerData"`
 	CreatedAt time.Time `json:"created_at" gorm:"<-:create" xml:"-"`
 	UpdatedAt time.Time `json:"update_at" xml:"-"`
+}
+
+type GroupedPlayer struct {
+	CreationDate time.Time `json:"creation_date"`
+	TeamID       uint      `json:"team_id"`
+	Week         uint16    `json:"week"`
+	Players      []Player  `json:"players"`
 }
 
 type CustomTime struct {

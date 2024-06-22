@@ -70,6 +70,7 @@ require (
 )
 
 require (
+	github.com/dghubble/oauth1 v0.7.3
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/swaggo/gin-swagger v1.6.0

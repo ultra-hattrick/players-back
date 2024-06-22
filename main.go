@@ -41,7 +41,7 @@ func main() {
 	controller := controller.NewPlayersController(service)
 	group := r.Group("/api/v1/team/:team_id/player")
 	group.GET("/", controller.GetPlayersByTeamID)
-	group.POST("/", controller.FetchPlayersByTeamID)
+	group.POST("/", controller.CreatePlayersByTeamID)
 	group.GET("/:player_id", controller.GetPlayersByIDAndTeamID)
 	group.GET("/match/:match_id", controller.FetchPlayersByTeamIDAndMatchID)
 	group.POST("/match/:match_id", controller.GetPlayersByTeamIDAndMatchID)
