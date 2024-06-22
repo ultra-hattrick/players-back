@@ -80,7 +80,6 @@ type Player struct {
 type GroupedPlayer struct {
 	CreationDate time.Time `json:"creation_date"`
 	TeamID       uint      `json:"team_id"`
-	Week         uint16    `json:"week"`
 	Players      []Player  `json:"players"`
 }
 

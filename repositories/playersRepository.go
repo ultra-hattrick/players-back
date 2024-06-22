@@ -20,32 +20,20 @@ func (r *PlayersRepository) InsertPlayers(players []*model.Player) error {
 }
 
 func (r *PlayersRepository) GetGroupedPlayersByTeamID(teamID uint, page, pageSize int) ([]*model.GroupedPlayer, error) {
-	var creationDates []time.Time
+
 	var results []*model.GroupedPlayer
 
 	// Subquery to get distinct creation dates for the given team ID, ordered and paginated
 	subquery := r.DB.Model(&model.Player{}).
 		Select("DISTINCT created_at").
-		Where("team_id = ?", teamID).
+		Where(&model.Player{TeamID: teamID}).
 		Order("created_at DESC").
 		Offset((page - 1) * pageSize).
 		Limit(pageSize)
 
-	// Get the distinct creation dates
-	err := r.DB.Table("(?) as sub", subquery).
-		Select("sub.created_at").
-		Scan(&creationDates).Error
-	if err != nil {
-		return nil, err
-	}
-
-	if len(creationDates) == 0 {
-		return results, nil
-	}
-
-	// Get players for the paginated creation dates
+		// Get players for the paginated creation dates
 	var players []model.Player
-	err = r.DB.Where("team_id = ? AND created_at IN ?", teamID, creationDates).
+	err := r.DB.Where("team_id = ? AND created_at IN (?)", teamID, subquery).
 		Order("created_at DESC").
 		Find(&players).Error
 	if err != nil {
@@ -61,24 +49,14 @@ func (r *PlayersRepository) GetGroupedPlayersByTeamID(teamID uint, page, pageSiz
 	}
 
 	// Populate results with grouped players
-	currentTime := time.Now()
-	for _, creationDate := range creationDates {
-		week := calculateWeekDifference(currentTime, creationDate)
+
+	for key := range groupedPlayersMap {
 		results = append(results, &model.GroupedPlayer{
-			CreationDate: creationDate,
+			CreationDate: key,
 			TeamID:       teamID,
-			Week:         week,
-			Players:      groupedPlayersMap[creationDate],
+			Players:      groupedPlayersMap[key],
 		})
 	}
 
 	return results, nil
-}
-
-func calculateWeekDifference(current, creation time.Time) uint16 {
-	currentYear, currentWeek := current.ISOWeek()
-	creationYear, creationWeek := creation.ISOWeek()
-	yearDiff := currentYear - creationYear
-	weekDiff := int(currentWeek - creationWeek)
-	return uint16(yearDiff*52 + weekDiff)
 }
