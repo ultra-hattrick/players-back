@@ -50,7 +50,7 @@ require (
 	github.com/swaggo/swag v1.8.12 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.12 // indirect
-	gitlab.com/uchile1/helper v0.0.0-20240619132512-250ee31a9629 // indirect
+	gitlab.com/uchile1/helper v0.0.0-20240623175911-042f877754fe // indirect
 	go.elastic.co/apm v1.15.0 // indirect
 	go.elastic.co/apm/module/apmhttp v1.15.0 // indirect
 	go.elastic.co/fastjson v1.1.0 // indirect

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -46,6 +48,13 @@ func main() {
 	group.GET("/match/:match_id", controller.FetchPlayersByTeamIDAndMatchID)
 	group.POST("/match/:match_id", controller.GetPlayersByTeamIDAndMatchID)
 	group.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	r.GET("/health", func(ctx *gin.Context) {
+		if err := helperDB.HealthheckPostgresHandler(); err != nil {
+			ctx.JSON(http.StatusInternalServerError, fmt.Sprintf("error conectarse a la DB %v", err.Error()))
+			return
+		}
+		ctx.Status(http.StatusOK)
+	})
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
 
