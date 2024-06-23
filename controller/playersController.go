@@ -5,8 +5,8 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/ultra-hattrick/helper/utils"
 	"github.com/ultra-hattrick/players-back/service"
-	"github.com/ultra-hattrick/players-back/utils"
 	"gitlab.com/uchile1/helper/helperHttp"
 	"gitlab.com/uchile1/helper/helperLog"
 )
