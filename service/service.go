@@ -35,6 +35,30 @@ func (s *PlayersService) CreatePlayersHistory(teamID uint) ([]*model.Player, err
 	if hd.Players == nil {
 		return nil, fmt.Errorf("invalid value players, must be distinct to null for team ID: %d", teamID)
 	}
+	//verificar si hay cambios en la forma y condicion de los jugadores,
+	// si hubo cambios, es que se cargó en entrenamiento y se puede cargar un registro histórico
+	GroupLastTraining, err := s.GetGroupedPlayersByTeamID(teamID, 1, 1)
+	if err != nil {
+		return nil, fmt.Errorf("error al obtener último registro de entrenamiento para el team ID: %d: %v", teamID, err)
+	}
+	if len(GroupLastTraining) != 0 {
+		loadedTraining := false
+		playersLastTraining := GroupLastTraining[0].Players
+		for _, p := range playersLastTraining {
+			for _, ht := range hd.Players {
+				if ht.PlayerID == p.PlayerID && (ht.PlayerForm != p.PlayerForm || ht.StaminaSkill != p.StaminaSkill) {
+					loadedTraining = true
+					break
+				}
+			}
+			if loadedTraining {
+				break
+			}
+		}
+		if !loadedTraining {
+			return nil, fmt.Errorf("no training (yet!) for team id: %d, last training loaded: %v", teamID, playersLastTraining[0].CreatedAt)
+		}
+	}
 	for _, v := range hd.Players {
 		v.TeamID = teamID
 	}
