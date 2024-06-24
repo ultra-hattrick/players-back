@@ -12,15 +12,6 @@ type HattrickData struct {
 	Error   *string   `xml:"Error"`
 }
 
-// NO SE OCUPA, PERO NO BORRAR
-// Response es una copia temporal del tipo Response en helperHttp y se usa para el swagger
-// @name Response
-type Response struct {
-	Status  string      `json:"status"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data,omitempty"`
-}
-
 type Player struct {
 	ID                 uint                  `json:"ID" gorm:"primaryKey;unique;autoIncrement" xml:"-"`
 	PlayerID           uint                  `json:"player_ID" gorm:"not null" xml:"PlayerID"`
