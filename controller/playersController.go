@@ -54,7 +54,12 @@ func (controller *PlayersController) CreatePlayersByTeamID(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, helperHttp.NewErrorResponse("Invalid team id"))
 		return
 	}
-	players, err := controller.PlayersService.CreatePlayersHistory(uint(teamID))
+	loadedByJob, err := utils.GetQueryBool(c, "loaded_by_job", false)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, helperHttp.NewErrorResponse(err.Error()))
+		return
+	}
+	players, err := controller.PlayersService.CreatePlayersHistory(uint(teamID), loadedByJob)
 	if err != nil {
 		helperLog.Logger.Error().Err(err).Msg("Failed to fetch")
 		c.JSON(http.StatusInternalServerError, helperHttp.NewErrorResponse(err.Error()))

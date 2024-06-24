@@ -63,8 +63,9 @@ type Player struct {
 		TrainerType       *uint8 `json:"trainer_type" xml:"TrainerType"`
 		TrainerSkillLevel *uint8 `json:"trainer_skill_level" xml:"TrainerSkillLevel"`
 	} `json:"trainer_data,omitempty" gorm:"embedded" xml:"TrainerData"`
-	CreatedAt time.Time `json:"created_at" gorm:"<-:create" xml:"-"`
-	UpdatedAt time.Time `json:"update_at" xml:"-"`
+	CreatedAt   time.Time `json:"created_at" gorm:"<-:create" xml:"-"`
+	UpdatedAt   time.Time `json:"update_at" xml:"-"`
+	LoadedByJob bool      `json:"loaded_by_job"`
 }
 
 type GroupedPlayer struct {

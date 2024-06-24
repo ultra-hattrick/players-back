@@ -22,7 +22,7 @@ func (s *PlayersService) GetGroupedPlayersByTeamID(teamID uint, page, pageSize i
 	return s.PlayersRepository.GetGroupedPlayersByTeamID(teamID, page, pageSize)
 }
 
-func (s *PlayersService) CreatePlayersHistory(teamID uint) ([]*model.Player, error) {
+func (s *PlayersService) CreatePlayersHistory(teamID uint, loadedByJob bool) ([]*model.Player, error) {
 	var hd model.HattrickData
 	err := utils.GetResultsFromHattrick(os.Getenv("PLAYERS_TEAM")+strconv.Itoa(int(teamID)), &hd)
 	if err != nil {
@@ -60,6 +60,7 @@ func (s *PlayersService) CreatePlayersHistory(teamID uint) ([]*model.Player, err
 	}
 	for _, v := range hd.Players {
 		v.TeamID = teamID
+		v.LoadedByJob = loadedByJob
 	}
 	return hd.Players, s.PlayersRepository.InsertPlayers(hd.Players)
 }
