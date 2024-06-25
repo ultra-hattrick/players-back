@@ -65,7 +65,7 @@ type Player struct {
 	} `json:"trainer_data,omitempty" gorm:"embedded" xml:"TrainerData"`
 	CreatedAt   time.Time `json:"created_at" gorm:"<-:create" xml:"-"`
 	UpdatedAt   time.Time `json:"update_at" xml:"-"`
-	LoadedByJob bool      `json:"loaded_by_job"`
+	LoadedByJob bool      `json:"loaded_by_job" xml:"-"`
 }
 
 type GroupedPlayer struct {
