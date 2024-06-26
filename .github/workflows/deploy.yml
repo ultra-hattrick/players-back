@@ -54,5 +54,5 @@ jobs:
           export DB_POSTGRES_HOST=${{ secrets.DB_POSTGRES_HOST }} &&
           export DB_POSTGRES_PASS=${{ secrets.DB_POSTGRES_PASS }} &&
           export DB_POSTGRES_USER=${{ secrets.DB_POSTGRES_USER }} &&
-          docker-compose up --build -d
+          docker-compose up --build -d --force-recreate
         "
