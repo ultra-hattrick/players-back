@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   players-back:
     build:
@@ -8,7 +6,8 @@ services:
       args:
         - REPO_URL=https://github.com/ultra-hattrick/players-back.git
         - ACCESS_TOKEN=${ACCESS_TOKEN}
-        - BRANCH_REPO=main
+        - BRANCH_REPO=${BRANCH_REPO}
+    image: hugomode/hattrick-players-back:latest
     container_name: hattrick-players-back
     ports:
       - "8042:8080"
@@ -35,7 +34,7 @@ services:
       PLAYERS_TEAM: "?file=players&version=2.6&actionType=view&orderBy=Age&teamID="
     networks:
       - proxy
-    restart: unless-stopped
+    restart: unless-stopped   
 
 networks:
   proxy:

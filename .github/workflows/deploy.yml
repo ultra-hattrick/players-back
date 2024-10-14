@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:    
 
 jobs:
   deploy:
@@ -54,5 +55,6 @@ jobs:
           export DB_POSTGRES_HOST=${{ secrets.DB_POSTGRES_HOST }} &&
           export DB_POSTGRES_PASS=${{ secrets.DB_POSTGRES_PASS }} &&
           export DB_POSTGRES_USER=${{ secrets.DB_POSTGRES_USER }} &&
-          docker-compose up --build -d --force-recreate
+          export BRANCH_REPO=main &&
+          docker compose build --no-cache && docker compose up -d --force-recreate
         "
