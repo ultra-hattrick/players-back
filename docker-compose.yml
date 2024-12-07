@@ -14,7 +14,7 @@ services:
     environment:
       TZ: America/Santiago
       GIN_MODE: release
-      LOG_LEVEL: debug
+      LOG_LEVEL: info
       #database
       DB_POSTGRES_HOST: ${DB_POSTGRES_HOST}
       DB_POSTGRES_PORT: 5432

@@ -45,7 +45,7 @@ func (s *PlayersService) CreatePlayersHistory(teamID uint, loadedByJob bool) ([]
 		playersLastTraining := GroupLastTraining[0].Players
 		for _, p := range playersLastTraining {
 			for _, ht := range hd.Players {
-				if ht.PlayerID == p.PlayerID && (ht.PlayerForm != p.PlayerForm || ht.StaminaSkill != p.StaminaSkill) {
+				if ht.PlayerID == p.PlayerID && (ht.PlayerForm != p.PlayerForm || ht.StaminaSkill != p.StaminaSkill || ht.TSI != p.TSI) {
 					loadedTraining = true
 					break
 				}
