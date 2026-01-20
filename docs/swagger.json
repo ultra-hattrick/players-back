@@ -6,7 +6,461 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "localhost:8080",
+    "host": "localhost:8082",
     "basePath": "/api/v1/team/{team_id}/player",
-    "paths": {}
+    "paths": {
+        "/": {
+            "get": {
+                "description": "Get a list of players grouped by creation date for a specific team",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "players"
+                ],
+                "summary": "Get grouped players by Team ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Team ID",
+                        "name": "team_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "pageNumber",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page size",
+                        "name": "pageSize",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/helperHttp.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/github_com_ultra-hattrick_players-back_internal_core_domain.GroupedPlayer"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/helperHttp.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/helperHttp.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/{player_id}": {
+            "get": {
+                "description": "Get players by ID and Team ID - Not Implemented",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "players"
+                ],
+                "summary": "Get players by ID and Team ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Team ID",
+                        "name": "team_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Player ID",
+                        "name": "player_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "501": {
+                        "description": "Not Implemented",
+                        "schema": {
+                            "$ref": "#/definitions/helperHttp.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/{team_id}/player/": {
+            "post": {
+                "description": "Fetch players from Hattrick and store them in the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "players"
+                ],
+                "summary": "Create players history",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Team ID",
+                        "name": "team_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Loaded by job",
+                        "name": "loaded_by_job",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/helperHttp.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/github_com_ultra-hattrick_players-back_internal_core_domain.Player"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/helperHttp.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/helperHttp.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/{team_id}/player/match/{match_id}": {
+            "get": {
+                "description": "Fetch players by Team ID and Match ID - Not Implemented",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "players"
+                ],
+                "summary": "Fetch players by Team ID and Match ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Team ID",
+                        "name": "team_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Match ID",
+                        "name": "match_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "501": {
+                        "description": "Not Implemented",
+                        "schema": {
+                            "$ref": "#/definitions/helperHttp.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Get players by Team ID and Match ID - Not Implemented",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "players"
+                ],
+                "summary": "Get players by Team ID and Match ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Team ID",
+                        "name": "team_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Match ID",
+                        "name": "match_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "501": {
+                        "description": "Not Implemented",
+                        "schema": {
+                            "$ref": "#/definitions/helperHttp.Response"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "github_com_ultra-hattrick_players-back_internal_core_domain.GroupedPlayer": {
+            "type": "object",
+            "properties": {
+                "creation_date": {
+                    "type": "string"
+                },
+                "players": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_ultra-hattrick_players-back_internal_core_domain.Player"
+                    }
+                },
+                "team_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_ultra-hattrick_players-back_internal_core_domain.Player": {
+            "type": "object",
+            "properties": {
+                "ID": {
+                    "type": "integer"
+                },
+                "age": {
+                    "type": "integer"
+                },
+                "age_days": {
+                    "type": "integer"
+                },
+                "aggressiveness": {
+                    "type": "integer"
+                },
+                "agreeability": {
+                    "type": "integer"
+                },
+                "arrival_date": {
+                    "$ref": "#/definitions/utilsModel.CustomTime"
+                },
+                "caps": {
+                    "type": "integer"
+                },
+                "caps_u20": {
+                    "type": "integer"
+                },
+                "cards": {
+                    "type": "integer"
+                },
+                "career_goals": {
+                    "type": "integer"
+                },
+                "career_hattricks": {
+                    "type": "integer"
+                },
+                "country_id": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "cup_goals": {
+                    "type": "integer"
+                },
+                "defender_skill": {
+                    "type": "integer"
+                },
+                "experience": {
+                    "type": "integer"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "friendlies_goals": {
+                    "type": "integer"
+                },
+                "goals_current_team": {
+                    "type": "integer"
+                },
+                "honesty": {
+                    "type": "integer"
+                },
+                "injury_level": {
+                    "type": "integer"
+                },
+                "keeper_skill": {
+                    "type": "integer"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "leadership": {
+                    "type": "integer"
+                },
+                "league_goals": {
+                    "type": "integer"
+                },
+                "loaded_by_job": {
+                    "type": "boolean"
+                },
+                "loyalty": {
+                    "type": "integer"
+                },
+                "matches_current_team": {
+                    "type": "integer"
+                },
+                "mother_club_bonus": {
+                    "type": "boolean"
+                },
+                "national_team_ID": {
+                    "type": "integer"
+                },
+                "nickname": {
+                    "type": "string"
+                },
+                "owner_notes": {
+                    "type": "string"
+                },
+                "passing_skill": {
+                    "type": "integer"
+                },
+                "player_ID": {
+                    "type": "integer"
+                },
+                "player_category_ID": {
+                    "type": "integer"
+                },
+                "player_form": {
+                    "type": "integer"
+                },
+                "player_number": {
+                    "type": "integer"
+                },
+                "playmaker_skill": {
+                    "type": "integer"
+                },
+                "salary": {
+                    "type": "integer"
+                },
+                "scorer_skill": {
+                    "type": "integer"
+                },
+                "set_pieces_skill": {
+                    "type": "integer"
+                },
+                "specialty": {
+                    "type": "integer"
+                },
+                "stamina_skill": {
+                    "type": "integer"
+                },
+                "statement": {
+                    "type": "string"
+                },
+                "team_ID": {
+                    "type": "integer"
+                },
+                "trainer_data": {
+                    "type": "object",
+                    "properties": {
+                        "trainer_skill_level": {
+                            "type": "integer"
+                        },
+                        "trainer_type": {
+                            "type": "integer"
+                        }
+                    }
+                },
+                "transfer_listed": {
+                    "type": "boolean"
+                },
+                "tsi": {
+                    "type": "integer"
+                },
+                "update_at": {
+                    "type": "string"
+                },
+                "watching_skill": {
+                    "type": "integer"
+                }
+            }
+        },
+        "helperHttp.Response": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "message": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "utilsModel.CustomTime": {
+            "type": "object",
+            "properties": {
+                "time.Time": {
+                    "type": "string"
+                }
+            }
+        }
+    }
 }

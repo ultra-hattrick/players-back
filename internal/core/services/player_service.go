@@ -1,4 +1,4 @@
-package service
+package services
 
 import (
 	"fmt"
@@ -6,24 +6,24 @@ import (
 	"strconv"
 
 	"github.com/ultra-hattrick/helper/utils"
-	"github.com/ultra-hattrick/players-back/model"
-	"github.com/ultra-hattrick/players-back/repositories"
+	"github.com/ultra-hattrick/players-back/internal/core/domain"
+	"github.com/ultra-hattrick/players-back/internal/core/ports"
 )
 
 type PlayersService struct {
-	PlayersRepository *repositories.PlayersRepository
+	PlayersRepository ports.PlayerRepository
 }
 
-func NewPlayersService(repo *repositories.PlayersRepository) *PlayersService {
+func NewPlayersService(repo ports.PlayerRepository) *PlayersService {
 	return &PlayersService{PlayersRepository: repo}
 }
 
-func (s *PlayersService) GetGroupedPlayersByTeamID(teamID uint, page, pageSize int) ([]*model.GroupedPlayer, error) {
-	return s.PlayersRepository.GetGroupedPlayersByTeamID(teamID, page, pageSize)
+func (s *PlayersService) GetGroupedPlayersByTeamID(teamID uint, pageNumber, pageSize int) ([]*domain.GroupedPlayer, error) {
+	return s.PlayersRepository.GetGroupedPlayersByTeamID(teamID, pageNumber, pageSize)
 }
 
-func (s *PlayersService) CreatePlayersHistory(teamID uint, loadedByJob bool) ([]*model.Player, error) {
-	var hd model.HattrickData
+func (s *PlayersService) CreatePlayersHistory(teamID uint, loadedByJob bool) ([]*domain.Player, error) {
+	var hd domain.HattrickData
 	err := utils.GetResultsFromHattrick(os.Getenv("PLAYERS_TEAM")+strconv.Itoa(int(teamID)), &hd)
 	if err != nil {
 		return nil, fmt.Errorf("error al obtener los jugadores del team ID: %d, desde hattrick: %v", teamID, err)

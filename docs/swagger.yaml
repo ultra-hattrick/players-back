@@ -1,10 +1,304 @@
 basePath: /api/v1/team/{team_id}/player
-host: localhost:8080
+definitions:
+  github_com_ultra-hattrick_players-back_internal_core_domain.GroupedPlayer:
+    properties:
+      creation_date:
+        type: string
+      players:
+        items:
+          $ref: '#/definitions/github_com_ultra-hattrick_players-back_internal_core_domain.Player'
+        type: array
+      team_id:
+        type: integer
+    type: object
+  github_com_ultra-hattrick_players-back_internal_core_domain.Player:
+    properties:
+      ID:
+        type: integer
+      age:
+        type: integer
+      age_days:
+        type: integer
+      aggressiveness:
+        type: integer
+      agreeability:
+        type: integer
+      arrival_date:
+        $ref: '#/definitions/utilsModel.CustomTime'
+      caps:
+        type: integer
+      caps_u20:
+        type: integer
+      cards:
+        type: integer
+      career_goals:
+        type: integer
+      career_hattricks:
+        type: integer
+      country_id:
+        type: integer
+      created_at:
+        type: string
+      cup_goals:
+        type: integer
+      defender_skill:
+        type: integer
+      experience:
+        type: integer
+      first_name:
+        type: string
+      friendlies_goals:
+        type: integer
+      goals_current_team:
+        type: integer
+      honesty:
+        type: integer
+      injury_level:
+        type: integer
+      keeper_skill:
+        type: integer
+      last_name:
+        type: string
+      leadership:
+        type: integer
+      league_goals:
+        type: integer
+      loaded_by_job:
+        type: boolean
+      loyalty:
+        type: integer
+      matches_current_team:
+        type: integer
+      mother_club_bonus:
+        type: boolean
+      national_team_ID:
+        type: integer
+      nickname:
+        type: string
+      owner_notes:
+        type: string
+      passing_skill:
+        type: integer
+      player_ID:
+        type: integer
+      player_category_ID:
+        type: integer
+      player_form:
+        type: integer
+      player_number:
+        type: integer
+      playmaker_skill:
+        type: integer
+      salary:
+        type: integer
+      scorer_skill:
+        type: integer
+      set_pieces_skill:
+        type: integer
+      specialty:
+        type: integer
+      stamina_skill:
+        type: integer
+      statement:
+        type: string
+      team_ID:
+        type: integer
+      trainer_data:
+        properties:
+          trainer_skill_level:
+            type: integer
+          trainer_type:
+            type: integer
+        type: object
+      transfer_listed:
+        type: boolean
+      tsi:
+        type: integer
+      update_at:
+        type: string
+      watching_skill:
+        type: integer
+    type: object
+  helperHttp.Response:
+    properties:
+      data: {}
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  utilsModel.CustomTime:
+    properties:
+      time.Time:
+        type: string
+    type: object
+host: localhost:8082
 info:
   contact: {}
   description: Para obtener los jugadores de los equipos desde Hattick y la base de
     datos.
   title: Players BACK API
   version: "1.0"
-paths: {}
+paths:
+  /:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of players grouped by creation date for a specific team
+      parameters:
+      - description: Team ID
+        in: path
+        name: team_id
+        required: true
+        type: integer
+      - description: Page number
+        in: query
+        name: pageNumber
+        type: integer
+      - description: Page size
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/helperHttp.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/github_com_ultra-hattrick_players-back_internal_core_domain.GroupedPlayer'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/helperHttp.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/helperHttp.Response'
+      summary: Get grouped players by Team ID
+      tags:
+      - players
+  /{player_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get players by ID and Team ID - Not Implemented
+      parameters:
+      - description: Team ID
+        in: path
+        name: team_id
+        required: true
+        type: integer
+      - description: Player ID
+        in: path
+        name: player_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "501":
+          description: Not Implemented
+          schema:
+            $ref: '#/definitions/helperHttp.Response'
+      summary: Get players by ID and Team ID
+      tags:
+      - players
+  /{team_id}/player/:
+    post:
+      consumes:
+      - application/json
+      description: Fetch players from Hattrick and store them in the database
+      parameters:
+      - description: Team ID
+        in: path
+        name: team_id
+        required: true
+        type: integer
+      - description: Loaded by job
+        in: query
+        name: loaded_by_job
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/helperHttp.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/github_com_ultra-hattrick_players-back_internal_core_domain.Player'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/helperHttp.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/helperHttp.Response'
+      summary: Create players history
+      tags:
+      - players
+  /{team_id}/player/match/{match_id}:
+    get:
+      consumes:
+      - application/json
+      description: Fetch players by Team ID and Match ID - Not Implemented
+      parameters:
+      - description: Team ID
+        in: path
+        name: team_id
+        required: true
+        type: integer
+      - description: Match ID
+        in: path
+        name: match_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "501":
+          description: Not Implemented
+          schema:
+            $ref: '#/definitions/helperHttp.Response'
+      summary: Fetch players by Team ID and Match ID
+      tags:
+      - players
+    post:
+      consumes:
+      - application/json
+      description: Get players by Team ID and Match ID - Not Implemented
+      parameters:
+      - description: Team ID
+        in: path
+        name: team_id
+        required: true
+        type: integer
+      - description: Match ID
+        in: path
+        name: match_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "501":
+          description: Not Implemented
+          schema:
+            $ref: '#/definitions/helperHttp.Response'
+      summary: Get players by Team ID and Match ID
+      tags:
+      - players
 swagger: "2.0"
