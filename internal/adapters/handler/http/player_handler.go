@@ -53,7 +53,7 @@ func (h *PlayersHandler) GetPlayersByTeamID(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, helperHttp.NewErrorResponse("Invalid team id"))
 		return
 	}
-	pageSize, err := utils.GetQueryInt(c, "pageSize", 1, func(arg int) bool { return arg <= 20 })
+	pageSize, err := utils.GetQueryInt(c, "pageSize", 10, func(arg int) bool { return arg <= 20 })
 	if err != nil {
 		c.JSON(http.StatusBadRequest, helperHttp.NewErrorResponse(err.Error()))
 		return
