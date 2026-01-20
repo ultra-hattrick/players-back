@@ -46,15 +46,13 @@ jobs:
     - name: Deploy with Docker Compose
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
-          cd ~/workspace/new-hattrick/${{ env.repo_name }} &&
-          export ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }} &&
+          cd ~/workspace/new-hattrick/${{ env.repo_name }} &&          
           export CONSUMER_SECRET=${{ secrets.CONSUMER_SECRET }} &&
           export CONSUMER_KEY=${{ secrets.CONSUMER_KEY }} &&
           export OAUTH1_TOKEN=${{ secrets.OAUTH1_TOKEN }} &&
           export OAUTH1_TOKEN_SECRET=${{ secrets.OAUTH1_TOKEN_SECRET }} &&          
           export DB_POSTGRES_HOST=${{ secrets.DB_POSTGRES_HOST }} &&
           export DB_POSTGRES_PASS=${{ secrets.DB_POSTGRES_PASS }} &&
-          export DB_POSTGRES_USER=${{ secrets.DB_POSTGRES_USER }} &&
-          export BRANCH_REPO=main &&
+          export DB_POSTGRES_USER=${{ secrets.DB_POSTGRES_USER }} &&          
           docker compose build --no-cache && docker compose up -d --force-recreate
         "

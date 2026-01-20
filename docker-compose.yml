@@ -2,11 +2,7 @@ services:
   players-back:
     build:
       context: .
-      dockerfile: ./Dockerfile
-      args:
-        - REPO_URL=https://github.com/ultra-hattrick/players-back.git
-        - ACCESS_TOKEN=${ACCESS_TOKEN}
-        - BRANCH_REPO=${BRANCH_REPO}
+      dockerfile: ./Dockerfile 
     image: hugomode/hattrick-players-back:latest
     container_name: hattrick-players-back
     ports:
