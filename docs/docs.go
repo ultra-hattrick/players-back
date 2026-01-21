@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/": {
             "get": {
-                "description": "Get a list of players grouped by creation date for a specific team",
+                "description": "Get a list of players for a specific team",
                 "consumes": [
                     "application/json"
                 ],
@@ -84,48 +84,7 @@ const docTemplate = `{
                         }
                     }
                 }
-            }
-        },
-        "/{player_id}": {
-            "get": {
-                "description": "Get players by ID and Team ID - Not Implemented",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "players"
-                ],
-                "summary": "Get players by ID and Team ID",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Team ID",
-                        "name": "team_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Player ID",
-                        "name": "player_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "501": {
-                        "description": "Not Implemented",
-                        "schema": {
-                            "$ref": "#/definitions/helperHttp.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/{team_id}/player/": {
+            },
             "post": {
                 "description": "Fetch players from Hattrick and store them in the database",
                 "consumes": [
@@ -183,6 +142,45 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/helperHttp.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/{player_id}": {
+            "get": {
+                "description": "Get players by ID and Team ID - Not Implemented",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "players"
+                ],
+                "summary": "Get players by ID and Team ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Team ID",
+                        "name": "team_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Player ID",
+                        "name": "player_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "501": {
+                        "description": "Not Implemented",
                         "schema": {
                             "$ref": "#/definitions/helperHttp.Response"
                         }

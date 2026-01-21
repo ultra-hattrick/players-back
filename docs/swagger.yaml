@@ -144,7 +144,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get a list of players grouped by creation date for a specific team
+      description: Get a list of players for a specific team
       parameters:
       - description: Team ID
         in: path
@@ -184,33 +184,6 @@ paths:
       summary: Get grouped players by Team ID
       tags:
       - players
-  /{player_id}:
-    get:
-      consumes:
-      - application/json
-      description: Get players by ID and Team ID - Not Implemented
-      parameters:
-      - description: Team ID
-        in: path
-        name: team_id
-        required: true
-        type: integer
-      - description: Player ID
-        in: path
-        name: player_id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "501":
-          description: Not Implemented
-          schema:
-            $ref: '#/definitions/helperHttp.Response'
-      summary: Get players by ID and Team ID
-      tags:
-      - players
-  /{team_id}/player/:
     post:
       consumes:
       - application/json
@@ -248,6 +221,32 @@ paths:
           schema:
             $ref: '#/definitions/helperHttp.Response'
       summary: Create players history
+      tags:
+      - players
+  /{player_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get players by ID and Team ID - Not Implemented
+      parameters:
+      - description: Team ID
+        in: path
+        name: team_id
+        required: true
+        type: integer
+      - description: Player ID
+        in: path
+        name: player_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "501":
+          description: Not Implemented
+          schema:
+            $ref: '#/definitions/helperHttp.Response'
+      summary: Get players by ID and Team ID
       tags:
       - players
   /{team_id}/player/match/{match_id}:
