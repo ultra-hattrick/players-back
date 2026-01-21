@@ -25,16 +25,16 @@ func (r *PlayerRepository) GetGroupedPlayersByTeamID(teamID uint, page, pageSize
 
 	// Subquery to find the latest ID for each player_id of the given team
 	subquery := r.DB.Model(&domain.Player{}).
-		Select("MAX(id)").
-		Where("team_id = ?", teamID).
-		Group("player_id")
+		Select("DISTINCT created_at").
+		Where(&domain.Player{TeamID: teamID}).
+		Order("created_at DESC").
+		Offset((page - 1) * pageSize).
+		Limit(pageSize)
 
 	// Get the latest records for each player with pagination
 	var players []domain.Player
-	err := r.DB.Where("id IN (?)", subquery).
+	err := r.DB.Where("team_id = ? AND created_at IN (?)", teamID, subquery).
 		Order("created_at DESC").
-		Offset((page - 1) * pageSize).
-		Limit(pageSize).
 		Find(&players).Error
 	if err != nil {
 		return nil, err
