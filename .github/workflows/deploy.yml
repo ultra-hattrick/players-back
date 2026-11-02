@@ -1,58 +1,103 @@
-name: Deploy to Remote Server
+name: CI and deploy
 
 on:
   push:
     branches:
       - main
-  workflow_dispatch:    
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: true
 
 jobs:
-  deploy:
+  quality:
+    name: Validate application
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2    
+      - name: Checkout repository
+        uses: actions/checkout@v6
 
-    - name: Set up SSH
-      uses: webfactory/ssh-agent@v0.5.3
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: 1.27.3
+          cache: true
 
-    - name: Extract repository name
-      id: extract_repo     
-      run: echo "repo_name=$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)" >> $GITHUB_ENV
+      - name: Validate Docker Compose
+        run: docker compose config --quiet
 
-    - name: Remove existing directory if it exists
-      run: |
-        set -x
-        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
-          rm -rf ~/workspace/new-hattrick/${{ env.repo_name  }}
-        "
+      - name: Download Go dependencies
+        run: go mod download
 
-    - name: Create directory
-      run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
-          mkdir -p ~/workspace/new-hattrick/${{ env.repo_name }}
-        "   
+      - name: Run Go vet
+        run: go vet ./...
 
-    - name: Copy files to remote server
-      run: |
-        set -e
-        pwd
-        ls -l
-        scp -r -o StrictHostKeyChecking=no "$(pwd)"/* ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/workspace/new-hattrick/${{ env.repo_name }}
+      - name: Build application
+        run: go build -o /tmp/players-back ./cmd
 
-    - name: Deploy with Docker Compose
-      run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
-          cd ~/workspace/new-hattrick/${{ env.repo_name }} &&          
-          export CONSUMER_SECRET=${{ secrets.CONSUMER_SECRET }} &&
-          export CONSUMER_KEY=${{ secrets.CONSUMER_KEY }} &&
-          export OAUTH1_TOKEN=${{ secrets.OAUTH1_TOKEN }} &&
-          export OAUTH1_TOKEN_SECRET=${{ secrets.OAUTH1_TOKEN_SECRET }} &&          
-          export DB_POSTGRES_HOST=${{ secrets.DB_POSTGRES_HOST }} &&
-          export DB_POSTGRES_PASS=${{ secrets.DB_POSTGRES_PASS }} &&
-          export DB_POSTGRES_USER=${{ secrets.DB_POSTGRES_USER }} &&          
-          docker compose build --no-cache && docker compose up -d --force-recreate
-        "
+  deploy:
+    name: Deploy to remote server
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: quality
+    environment: production
+    env:
+      SSH_CONNECTION: ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}
+      DEPLOY_DIR: workspace/new-hattrick/players-back
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Configure SSH host verification
+        env:
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+        run: |
+          test -n "$SSH_KNOWN_HOSTS"
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Copy release to remote server
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh "$SSH_CONNECTION" "rm -rf -- '$DEPLOY_DIR' && mkdir -p -- '$DEPLOY_DIR'"
+          git archive --format=tar HEAD \
+            | ssh "$SSH_CONNECTION" "tar -xf - -C '$DEPLOY_DIR'"
+
+      - name: Build and deploy
+        env:
+          CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
+          CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
+          OAUTH1_TOKEN: ${{ secrets.OAUTH1_TOKEN }}
+          OAUTH1_TOKEN_SECRET: ${{ secrets.OAUTH1_TOKEN_SECRET }}
+          DB_POSTGRES_HOST: ${{ secrets.DB_POSTGRES_HOST }}
+          DB_POSTGRES_PASS: ${{ secrets.DB_POSTGRES_PASS }}
+          DB_POSTGRES_USER: ${{ secrets.DB_POSTGRES_USER }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$CONSUMER_SECRET"
+          test -n "$CONSUMER_KEY"
+          test -n "$OAUTH1_TOKEN"
+          test -n "$OAUTH1_TOKEN_SECRET"
+          test -n "$DB_POSTGRES_HOST"
+          test -n "$DB_POSTGRES_PASS"
+          test -n "$DB_POSTGRES_USER"
+          printf 'CONSUMER_SECRET=%s\nCONSUMER_KEY=%s\nOAUTH1_TOKEN=%s\nOAUTH1_TOKEN_SECRET=%s\nDB_POSTGRES_HOST=%s\nDB_POSTGRES_PASS=%s\nDB_POSTGRES_USER=%s\n' \
+            "$CONSUMER_SECRET" "$CONSUMER_KEY" "$OAUTH1_TOKEN" "$OAUTH1_TOKEN_SECRET" \
+            "$DB_POSTGRES_HOST" "$DB_POSTGRES_PASS" "$DB_POSTGRES_USER" \
+            | base64 -w0 \
+            | ssh "$SSH_CONNECTION" "cd '$DEPLOY_DIR' && base64 -d > .env && chmod 600 .env && docker compose build --pull && docker compose up -d --force-recreate --remove-orphans --wait --wait-timeout 60 && docker compose ps"

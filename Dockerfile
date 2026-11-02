@@ -1,32 +1,30 @@
-FROM golang:1.22.5-alpine AS builder
+# syntax=docker/dockerfile:1.7
 
-ENV GO111MODULE=on
+FROM golang:1.27.3-alpine AS builder
 
-WORKDIR /app
+WORKDIR /src
+RUN apk add --no-cache git
 
-# Copia el código fuente al contenedor
-COPY . /app/repo_remote
+COPY go.mod go.sum ./
+RUN go mod download
 
-WORKDIR /app/repo_remote
+COPY . .
+RUN mkdir -p /out \
+    && CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-s -w" -o /out/myapp ./cmd
 
-# Descarga las dependencias y compila la aplicación
-RUN go mod tidy
-RUN GOOS=linux go build -o /app/myapp cmd/main.go
+FROM alpine:3.22
 
-FROM alpine:latest
+RUN apk add --no-cache tzdata git postgresql-client \
+    && addgroup -S app -g 1000 \
+    && adduser -S -g app app --uid 1000
 
-RUN apk --no-cache add tzdata
 ENV TZ=America/Santiago
 
-RUN addgroup -S app -g 1000 && adduser -S -g app app --uid 1000
-
-COPY --from=builder --chown=app:app /app/myapp /app/myapp
-RUN apk add --no-cache git postgresql-client
-COPY /scripts/wait-for-postgres.sh /app/wait-for-postgres.sh
-RUN chmod +x /app/wait-for-postgres.sh
+COPY --from=builder --chown=app:app /out/myapp /app/myapp
+COPY --chown=app:app --chmod=755 scripts/wait-for-postgres.sh /app/wait-for-postgres.sh
 
 USER app
 WORKDIR /app
-
 EXPOSE 8080
+
 CMD ["/bin/sh", "/app/wait-for-postgres.sh", "/app/myapp"]
